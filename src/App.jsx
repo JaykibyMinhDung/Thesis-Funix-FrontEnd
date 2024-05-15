@@ -8,8 +8,12 @@ import Footer from './components/Footer'
 import Cart from './page/Cart'
 import Login from './page/Login'
 
+import clothingbanner from './assets/clothingbanner.png'
+import cosmeticsbanner from './assets/cosmeticsbanner.png'
+import electronicsBanner from './assets/electronicsbanner.png'
+
 function App() {
-  const [count, setCount] = useState(0)
+  // const [count, setCount] = useState(0)
 
   return (
     <main className='text-tertiary'>
@@ -17,10 +21,10 @@ function App() {
         <Header />
         <Routes>
           <Route path='/' element={<Home />} />
-          <Route path='/clothing' element={<Category />} />
-          <Route path='/cosmetics' element={<Category />} />
-          <Route path='/electronics' element={<Category />} />
-          <Route path='/product' element={<Category />}>
+          <Route path='/clothing' element={<Category category={"clothing"} banner={clothingbanner} />} />
+          <Route path='/cosmetics' element={<Category category={'cosmetics'} banner={cosmeticsbanner} />} />
+          <Route path='/electronics' element={<Category category={"electronics"} banner={electronicsBanner} />} />
+          <Route path='/product' element={<Product />}>
             <Route path=':productId' element={<Product />} />  
           </Route>
           <Route path='/cart-page' element={<Cart />} />

@@ -25,10 +25,12 @@ const RelatedProducts = () => {
                     slidesPerView: 4,
                     spaceBetween: 30,  
                 }
-            }} className='h-[422px] sm:h-[477px] mt-5'>
+            }} 
+            // className='h-[422px] sm:h-[477px] mt-5'>
+            className='h-[188px] mt-5'>
                 {LATEST.map((item, index) => (
                     <SwiperSlide key={index}>
-                        <Link className='flexCenter gap-x-5 bg-white p-4 rounded-xl' to={''}>
+                        <Link onClick={window.scrollTo(0, 0)} className='flexCenter gap-x-5 bg-white p-4 rounded-xl' to={`/product/${item.id}`}>
                             <img src={item.image} height={77} width={77} alt="" className='rounded-lg drop-shadow-xl' />
                             <div className='flex flex-col gap-y-1'>
                                 <h4 className='line-clamp-1 medium-16'>{item.name}</h4>
