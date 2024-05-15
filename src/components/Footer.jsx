@@ -21,7 +21,7 @@ const Footer = () => {
         </div>
         <SocialIcons />
         <hr className="h-[1px] w-2/3 my-3" />
-        <div className="text-white">Copy right &copy; Merchanza | All rights reserved </div>
+        <div className="text-white">Copy right &copy; JKB | All rights reserved </div>
       </div>
     </footer>
   );
