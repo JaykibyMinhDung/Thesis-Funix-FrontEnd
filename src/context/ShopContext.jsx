@@ -25,6 +25,8 @@ const ShopContextProvider = (props) => {
   };
 
   const removeCart = (itemId) => {
+    const isRemove = window.confirm("Would you like remove product?")
+    if (!isRemove) return 
     setCartItems((prev) => ({
       ...prev,
       [itemId]: prev[itemId] - 1,

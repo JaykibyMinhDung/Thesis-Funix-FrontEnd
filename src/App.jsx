@@ -11,6 +11,7 @@ import Login from './page/Login'
 import clothingbanner from './assets/clothingbanner.png'
 import cosmeticsbanner from './assets/cosmeticsbanner.png'
 import electronicsBanner from './assets/electronicsbanner.png'
+import Checkout from './page/Checkout'
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -21,6 +22,7 @@ function App() {
         <Header />
         <Routes>
           <Route path='/' element={<Home />} />
+          {/* <Route path='/checkout' element={<Checkout />} /> */}
           <Route path='/clothing' element={<Category category={"clothing"} banner={clothingbanner} />} />
           <Route path='/cosmetics' element={<Category category={'cosmetics'} banner={cosmeticsbanner} />} />
           <Route path='/electronics' element={<Category category={"electronics"} banner={electronicsBanner} />} />
