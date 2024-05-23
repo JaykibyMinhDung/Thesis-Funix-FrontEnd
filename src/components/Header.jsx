@@ -7,12 +7,15 @@ import Navbar from "./Navbar";
 import { MdMenu, MdClose } from "react-icons/md";
 import { RiShoppingCart2Line } from "react-icons/ri";
 import { ShopContext } from "../context/ShopContext";
+import UserAPI from "../apis/user";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const [menuOpened, setmenuOpened] = useState(false);
   const toggleMenu = () => {
     setmenuOpened(!menuOpened);
   };
+
   const { getTotalCartItems } = useContext(ShopContext);
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +31,31 @@ const Header = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, [menuOpened]);
+
+  const logout = async () => {
+    const isLogout = window.confirm("Are you want to logout?");
+    if (isLogout) {
+      try {
+        await UserAPI.logout();
+        localStorage.clear()
+        toast.success("Logout is successful!", {
+          autoClose: 2000,
+          pauseOnHover: false,
+          theme: "dark",
+        });
+        setTimeout(() => {
+          window.location.reload()
+        }, 4000);
+      } catch (error) {
+        console.error(error)
+        toast.error("Logout is failed!", {
+          autoClose: 2000,
+          pauseOnHover: false,
+          theme: "dark",
+        });
+      }
+    }
+  };
 
   return (
     <header className="max-padd-container text-red-500 w-full z-50">
@@ -72,15 +100,27 @@ const Header = () => {
                   {getTotalCartItems()}
                 </span>
               </NavLink>
-              <NavLink
-                to={"/login"}
-                className={
-                  "btn-secondary flexCenter gap-x-2 medium-16 rounded-xl"
-                }
-              >
-                <img src={user} alt="" height={19} width={19} />
-                Login
-              </NavLink>
+              {localStorage.getItem("id_user") ? (
+                <div
+                  onClick={logout}
+                  className={
+                    "btn-secondary flexCenter gap-x-2 medium-16 rounded-xl"
+                  }
+                >
+                  <img src={user} alt="" height={19} width={19} />
+                  Logout
+                </div>
+              ) : (
+                <NavLink
+                  to={"/login"}
+                  className={
+                    "btn-secondary flexCenter gap-x-2 medium-16 rounded-xl"
+                  }
+                >
+                  <img src={user} alt="" height={19} width={19} />
+                  Login
+                </NavLink>
+              )}
             </div>
           </div>
         </div>

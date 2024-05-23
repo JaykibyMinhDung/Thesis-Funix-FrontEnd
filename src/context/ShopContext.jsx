@@ -6,6 +6,7 @@ import CartItem from "../components/CartItem";
 export const ShopContext = createContext(null);
 
 const getDefaultCart = () => {
+  const user = localStorage.getItem("user")
   let cart = {};
   for (let index = 0; index < all_products.length; index++) {
     // const element = cart[index];
