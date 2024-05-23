@@ -22,7 +22,7 @@ const ProductAPI = {
   // 	return axiosClient.get(url);
   // },
   getTrenddingProduct: (query) => {
-    const url = `/products?status=${query}`;
+    const url = `/api/products?status=${query}`;
     return axiosClient.get(url);
   },
   // Cart
@@ -30,9 +30,9 @@ const ProductAPI = {
     const url = `/api/cart/${id}`;
     return axiosClient.get(url);
   },
-  postCart: (params) => {
-    const url = `/api/cart`;
-    return axiosClient.post(url, { ...params });
+  postCart: (query) => {
+    const url = `/api/cart?count=${query.count}&idProduct=${query.idProduct}&idUser=${query.idUser}`;
+    return axiosClient.post(url);
   },
   deletedCart: (query) => {
     const url = `/api/cart?count=${query}&idProduct=${query}&idUser=${query}`;

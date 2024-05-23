@@ -24,7 +24,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* <Route path='/checkout' element={<Checkout />} /> */}
+          <Route path='/checkout' element={<Checkout />} />
           <Route
             path="/clothing"
             element={<Category category={"clothing"} banner={clothingbanner} />}

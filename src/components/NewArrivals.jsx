@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import LATEST from "../assets/latest.js";
 import Item from "./Item.jsx";
+import ProductAPI from "../apis/product.js";
 
 const NewArrivals = () => {
+  const [newProducts, setNewProducts] = useState([])
+
+  useEffect(() => {
+    async function fetchData() {
+      const products = await ProductAPI.getTrenddingProduct("new")
+      setNewProducts(products.newProducts)
+    }
+    fetchData()
+  }, [])
+
   return (
     <section className="max-padd-container bg-primary p-12 xl:py-28">
       <div className="text-center max-w-xl mx-auto">
@@ -15,10 +26,11 @@ const NewArrivals = () => {
         </p>
       </div>
       <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 gap-y-28 mt-32">
-        {LATEST.map((item, index) => (
+        {newProducts.map((item, index) => (
           <Item
             key={index}
             id={item.id}
+            _id={item._id}
             name={item.name}
             image={item.image}
             new_price={item.new_price}

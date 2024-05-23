@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { createContext } from "react";
 import all_products from "../assets/all_products";
 import CartItem from "../components/CartItem";
+import ProductAPI from "../apis/product";
 
 export const ShopContext = createContext(null);
 
 const getDefaultCart = () => {
-  const user = localStorage.getItem("user")
   let cart = {};
   for (let index = 0; index < all_products.length; index++) {
     // const element = cart[index];
@@ -16,6 +16,7 @@ const getDefaultCart = () => {
 };
 
 const ShopContextProvider = (props) => {
+  const user = localStorage.getItem("user");
   const [cartItems, setCartItems] = useState(getDefaultCart());
 
   const addToCart = (itemId) => {
@@ -26,8 +27,8 @@ const ShopContextProvider = (props) => {
   };
 
   const removeCart = (itemId) => {
-    const isRemove = window.confirm("Would you like remove product?")
-    if (!isRemove) return 
+    const isRemove = window.confirm("Would you like remove product?");
+    if (!isRemove) return;
     setCartItems((prev) => ({
       ...prev,
       [itemId]: prev[itemId] - 1,
@@ -45,19 +46,21 @@ const ShopContextProvider = (props) => {
     return totalAmount;
   };
 
-  const getTotalCartItems = () => {
+  const getTotalCartItems = async () => {
     let totalItem = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        totalItem += cartItems[item];
-      }
-    }
-    return totalItem;
+    
+    // for (const item in cartItems) {
+    //   if (cartItems[item] > 0) {
+    //     totalItem += cartItems[item];
+    //   }
+    // }
+    return 0;
   };
 
   const contextValue = {
     all_products,
     cartItems,
+    user,
     addToCart,
     removeCart,
     getTotalCartAmount,
