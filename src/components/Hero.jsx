@@ -5,7 +5,7 @@ import RelatedProducts from './RelatedProducts'
 const Hero = () => {
   return (
     <section>
-        <div className='max-padd-container bg-hero bg-cover bg-center bg-no-repeat h-[744px] w-full'>
+        <div className='max-padd-container bg-hero bg-cover bg-center bg-no-repeat h-[848px] w-full'>
             <div className='relative top-24 xs:top-32'>
                 <h4 className='uppercase medium-18 tracking-wider'>TRENDY TREASURES</h4>
                 <h2 className='h1 capitalize max-w-[40rem]'>Elevate your look <span className='text-secondary'> with every click </span>. Shop today!</h2>

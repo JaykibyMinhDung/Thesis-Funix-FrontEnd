@@ -10,7 +10,7 @@ const Footer = () => {
       <div className="flexCenter flex-col gap-y-4">
         <Link to={"/"} className="flex items-center gap-x-2">
           <img src={logo} alt="" width={31} height={31} />
-          <span className="bold-24 hidden xs:flex text-white">Merchanze</span>
+          <span className="bold-24 hidden xs:flex text-white">JaykibyShop</span>
         </Link>
         <div className="py-4">
           <Navbar

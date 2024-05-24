@@ -13,7 +13,7 @@ import ProductAPI from "../apis/product";
 
 const Header = () => {
   const [menuOpened, setmenuOpened] = useState(false);
-  const [getTotalCartItems, setgetTotalCartItems] = useState(false);
+  const [getTotalCartItems, setgetTotalCartItems] = useState(0);
   const toggleMenu = () => {
     setmenuOpened(!menuOpened);
   };
@@ -67,7 +67,7 @@ const Header = () => {
   };
 
   return (
-    <header className="max-padd-container text-red-500 w-full z-50">
+    <header className="fixed inset-x-8 bg-white max-padd-container text-red-500 w-full z-50">
       <div className="flexBetween py-3">
         <Link to={"/"} className={"flex items-center gap-y-2 gap-x-3"}>
           <img src={logo} alt={"Logoalt"} height={31} width={31} />
