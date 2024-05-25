@@ -1,12 +1,45 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import { TbTrash } from "react-icons/tb";
+import ProductAPI from "../apis/product";
+import { toast } from "react-toastify";
 
 const CartItem = () => {
-  const { all_products, cartItems, removeCart, getTotalCartAmount } = useContext(ShopContext);
+  // const { userHandle, cartItems, removeCart, getTotalCartAmount } =
+  // useContext(ShopContext);
+
+  const [getCart, setGetCart] = useState([]);
+  const [total, setTotal] = useState([]);
+
+  const removeCart = async (id) => {
+    try {
+      const resul = await ProductAPI.deletedCart({
+        count: 1,
+        idProduct: id,
+        idUser: JSON.parse(localStorage.getItem("user")).id,
+      });
+      toast.success(resul.meta.message0);
+      window.location.reload()
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    console.log(user);
+    async function fetchData() {
+      const cart = await ProductAPI.getCart(user.id);
+      setGetCart(cart.cart.cartData);
+      setTotal(cart.total);
+    }
+    fetchData();
+  }, []);
+  console.log(getCart);
+
   return (
     <section className="max-padd-container bg-primary rounded-3xl">
-      <div className="py-10">
+      <div className="py-24">
         <table className="w-full mx-auto">
           <thead>
             <tr className="border border-tertiary/90 bg-tertiary/90 text-white regular-16 sm:regular:18 text-start py-12">
@@ -19,8 +52,8 @@ const CartItem = () => {
             </tr>
           </thead>
           <tbody className="border border-slate-900/20">
-            {all_products.map((product) => {
-              if (cartItems[product.id] > 0) {
+            {getCart?.map((product) => {
+              if (getCart.length > 0) {
                 return (
                   <tr
                     key={product.id}
@@ -39,10 +72,8 @@ const CartItem = () => {
                       <div className="line-clamp-3">{product.name}</div>
                     </td>
                     <td>${product.new_price}</td>
-                    <td className="w-16 h-16 bg-white">
-                      {cartItems[product.id]}
-                    </td>
-                    <td>${product.new_price * cartItems[product.id]}</td>
+                    <td className="w-16 h-16 bg-white">{product.quantity}</td>
+                    <td>${product.new_price * product.quantity}</td>
                     <td>
                       <div className="bold-22 relative left-1/2">
                         <TbTrash onClick={() => removeCart(product.id)} />
@@ -60,7 +91,7 @@ const CartItem = () => {
             <div>
               <div className="flexBetween py-4">
                 <h4 className="medium-16">Subtotal:</h4>
-                <h4 className="text-gray-30 font-semibold">${getTotalCartAmount()}</h4>
+                <h4 className="text-gray-30 font-semibold">${total}</h4>
               </div>
               <hr />
               <div className="flexBetween py-4">
@@ -70,7 +101,7 @@ const CartItem = () => {
               <hr />
               <div className="flexBetween py-4">
                 <h4 className="medium-18">Total:</h4>
-                <h4 className="bold-18">${getTotalCartAmount()}</h4>
+                <h4 className="bold-18">${total}</h4>
               </div>
             </div>
             <button className="btn-dark w-44 rounded-xl">Checkout</button>

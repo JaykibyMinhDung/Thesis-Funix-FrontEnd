@@ -44,7 +44,7 @@ const RelatedProducts = () => {
               <Link
                 onClick={window.scrollTo(0, 0)}
                 className="flexCenter gap-x-5 bg-white p-4 rounded-xl"
-                to={`/product/${item.id}`}
+                to={`/product/${item._id}`}
               >
                 <img
                   src={item.image}

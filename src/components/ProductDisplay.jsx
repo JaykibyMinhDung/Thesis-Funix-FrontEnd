@@ -5,20 +5,24 @@ import ProductAPI from "../apis/product";
 import { toast } from "react-toastify";
 
 const ProductDisplay = ({ product }) => {
-  const { user } = useContext(ShopContext);
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  // const { userHandle } = useContext(ShopContext);
+  // console.log(localStorage.getItem("id_user"))
+  // console.log(JSON.parse(localStorage.getItem("id_user")))
   const addToCart = async () => {
     try {
-      const id = await JSON.parse(user);
-      console.log(id.id);
       const resul = await ProductAPI.postCart({
         count: 1,
         idProduct: product._id,
-        idUser: id.id,
+        idUser: localStorage.getItem("id_user"),
       });
       toast.info(resul.meta?.message, {
         closeOnClick: true,
         pauseOnHover: true,
       });
+
+      await delay(5000)
+      window.location.reload()
     } catch (error) {
       console.log(error);
       toast.error("You need login to buy");

@@ -35,7 +35,7 @@ const ProductAPI = {
     return axiosClient.post(url);
   },
   deletedCart: (query) => {
-    const url = `/api/cart?count=${query}&idProduct=${query}&idUser=${query}`;
+    const url = `/api/cart?count=${query.count}&idProduct=${query.idProduct}&idUser=${query.idUser}`;
     return axiosClient.delete(url);
   },
   // order

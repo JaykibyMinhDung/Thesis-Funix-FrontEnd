@@ -18,15 +18,14 @@ const Header = () => {
     setmenuOpened(!menuOpened);
   };
 
-  const { user } = useContext(ShopContext);
+  // const { userHandle } = useContext(ShopContext);
 
   useEffect(() => {
+    const user = localStorage.getItem("user")
     async function fetchData() {
-      const idUser = JSON.parse(user)
-      const cart = await ProductAPI.getCart(idUser.id)
-      setgetTotalCartItems(cart.cart.length);
+      const cart = await ProductAPI.getCart(JSON.parse(user).id)
+      setgetTotalCartItems(cart.cart.cartData.length);
     }
-    fetchData()
     const handleScroll = () => {
       if (window.scrollY > 0) {
         if (menuOpened) {
@@ -34,6 +33,7 @@ const Header = () => {
         }
       }
     };
+    fetchData()
     window.addEventListener("scroll", handleScroll);
 
     return () => {
@@ -106,7 +106,7 @@ const Header = () => {
               <NavLink to={"/cart-page "} className={"flex"}>
                 <RiShoppingCart2Line className="p-2 h-10 w-10 hover:text-secondary" />
                 <span className="relative flexCenter w-5 h-5 rounded-full bg-secondary text-primary medium-14 -top-2 right-3">
-                  {getTotalCartItems}
+                  {getTotalCartItems || 0}
                 </span>
               </NavLink>
               {localStorage.getItem("id_user") ? (
@@ -126,7 +126,7 @@ const Header = () => {
                     "btn-secondary flexCenter gap-x-2 medium-16 rounded-xl"
                   }
                 >
-                  <img src={user} alt="" height={19} width={19} />
+                  <img src={userImg} alt="" height={19} width={19} />
                   Login
                 </NavLink>
               )}
