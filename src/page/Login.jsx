@@ -10,12 +10,17 @@ const Login = () => {
     password: "",
   });
 
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
+  const delay = new Promise((resolve, reject) => {setTimeout(() => {
+    resolve()
+  }, 3000);})
 
   const changeInput = (event) => {
     setInput(() => {
       return {
         ...input,
+        username:
+          event.target?.name === "username" ? event.target?.value : input.username,
         email:
           event.target?.name === "email" ? event.target?.value : input.email,
         password:
@@ -28,17 +33,27 @@ const Login = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await UserAPI.login(input);
-      if (!response?.statusCode) {
-        throw new Error(response.meta[0].message);
+      if (state === "Login") {
+        const response = await UserAPI.login(input);
+        if (!response?.statusCode) {
+          throw new Error(response.message);
+        }
+        // dispatch({ type: "LOGIN_SUCCESS", payload: response.data });
+        localStorage.setItem("id_user", response.meta[0].id);
+        localStorage.setItem("user", JSON.stringify(response.meta[0]));
+        alert(response.meta[0].message);
+        // props.setLogin(true);
+        navigate("/");
+        window.location.reload();
+      } else {
+        const response = await UserAPI.register(input);
+        if (!response?.statusCode) {
+          throw new Error(response.message);
+        }
+        alert(response.message);
+        navigate("/login");
+        window.location.reload();
       }
-      // dispatch({ type: "LOGIN_SUCCESS", payload: response.data });
-      localStorage.setItem("id_user", response.meta[0].id);
-      localStorage.setItem("user", JSON.stringify(response.meta[0]));
-      alert(response.meta[0].message);
-      // props.setLogin(true);
-      naviagte("/");
-      window.location.reload();
     } catch (error) {
       alert(error || "Đăng nhập thất bại");
     }
@@ -107,7 +122,7 @@ const Login = () => {
               <p className="text-black pb-2 font-bold">
                 Forgot Password{" "}
                 <span
-                  onClick={() => setState("Sign Up")}
+                  onClick={() => navigate("/change-password", { state: { id: 7, flag: 'forgot password' } })}
                   className="text-secondary underline cursor-pointer"
                 >
                   Click Here!
@@ -116,7 +131,7 @@ const Login = () => {
               <p className="text-black font-bold">
                 Change new password{" "}
                 <span
-                  onClick={() => setState("Sign Up")}
+                  onClick={() => navigate("/change-password")}
                   className="text-secondary underline cursor-pointer"
                 >
                   Click Here!

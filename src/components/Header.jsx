@@ -1,17 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import logo from "../assets/logo.png";
 import userImg from "../assets/user.svg";
 import Navbar from "./Navbar";
 import { MdMenu, MdClose } from "react-icons/md";
 import { RiShoppingCart2Line } from "react-icons/ri";
-import { ShopContext } from "../context/ShopContext";
+// import { ShopContext } from "../context/ShopContext";
 import UserAPI from "../apis/user";
 import { toast } from "react-toastify";
 import ProductAPI from "../apis/product";
 
 const Header = () => {
+  const navigate = useNavigate();
   const [menuOpened, setmenuOpened] = useState(false);
   const [getTotalCartItems, setgetTotalCartItems] = useState(0);
   const toggleMenu = () => {
@@ -21,10 +22,14 @@ const Header = () => {
   // const { userHandle } = useContext(ShopContext);
 
   useEffect(() => {
-    const user = localStorage.getItem("user")
+    const user = localStorage.getItem("user");
     async function fetchData() {
-      const cart = await ProductAPI.getCart(JSON.parse(user).id)
-      setgetTotalCartItems(cart.cart.cartData.length);
+      try {
+        const cart = await ProductAPI.getCart(JSON.parse(user).id);
+        setgetTotalCartItems(cart.cart.cartData.length);
+      } catch (error) {
+        return navigate("/");
+      }
     }
     const handleScroll = () => {
       if (window.scrollY > 0) {
@@ -33,7 +38,7 @@ const Header = () => {
         }
       }
     };
-    fetchData()
+    fetchData();
     window.addEventListener("scroll", handleScroll);
 
     return () => {
@@ -103,22 +108,24 @@ const Header = () => {
               />
             )}
             <div className="flexBetween sm:gap-x-6">
-              <NavLink to={"/cart-page "} className={"flex"}>
-                <RiShoppingCart2Line className="p-2 h-10 w-10 hover:text-secondary" />
-                <span className="relative flexCenter w-5 h-5 rounded-full bg-secondary text-primary medium-14 -top-2 right-3">
-                  {getTotalCartItems || 0}
-                </span>
-              </NavLink>
               {localStorage.getItem("id_user") ? (
-                <div
-                  onClick={logout}
-                  className={
-                    "btn-secondary flexCenter gap-x-2 medium-16 rounded-xl"
-                  }
-                >
-                  <img src={userImg} alt="" height={19} width={19} />
-                  Logout
-                </div>
+                <>
+                  <NavLink to={"/cart-page "} className={"flex"}>
+                    <RiShoppingCart2Line className="p-2 h-10 w-10 hover:text-secondary" />
+                    <span className="relative flexCenter w-5 h-5 rounded-full bg-secondary text-primary medium-14 -top-2 right-3">
+                      {getTotalCartItems || 0}
+                    </span>
+                  </NavLink>
+                  <div
+                    onClick={logout}
+                    className={
+                      "btn-secondary flexCenter gap-x-2 medium-16 rounded-xl"
+                    }
+                  >
+                    <img src={userImg} alt="" height={19} width={19} />
+                    Logout
+                  </div>
+                </>
               ) : (
                 <NavLink
                   to={"/login"}

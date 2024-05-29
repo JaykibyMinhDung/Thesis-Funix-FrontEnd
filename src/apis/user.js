@@ -5,20 +5,23 @@ const UserAPI = {
 		const url = '/login';
 		return axiosClient.post(url, {...params});
 	},
-
-	getAllUser: () => {
-		const url = '/users/all';
-		return axiosClient.get(url);
+	register: (params) => {
+		const url = '/signup';
+		return axiosClient.post(url, {...params});
+	},
+	changePassword: (id) => {
+		const url = `/change-password/${id}`;
+		return axiosClient.put(url);
 	},
 	
-	getDetailData: (id) => {
-		const url = `/users/${id}`;
-		return axiosClient.get(url);
+	resetPassword: () => {
+		const url = `/reset`;
+		return axiosClient.post(url);
 	},
 
-	postSignUp: (query) => {
-		const url = `/users/signup/${query}`;
-		return axiosClient.post(url);
+	vertifyCodePassword: (token) => {
+		const url = `/resetpass/${token}`;
+		return axiosClient.get(url);
 	},
 
 	logout: () => {

@@ -14,6 +14,7 @@ import electronicsBanner from "./assets/electronicsbanner.png";
 import Checkout from "./page/Checkout";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import ChangePassword from "./components/ChangePassword";
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -46,6 +47,7 @@ function App() {
           </Route>
           <Route path="/cart-page" element={<Cart />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/change-password" element={<ChangePassword />} />
         </Routes>
         <Footer />
       </BrowserRouter>

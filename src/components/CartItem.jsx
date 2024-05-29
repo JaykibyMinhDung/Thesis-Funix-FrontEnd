@@ -3,11 +3,12 @@ import { ShopContext } from "../context/ShopContext";
 import { TbTrash } from "react-icons/tb";
 import ProductAPI from "../apis/product";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const CartItem = () => {
   // const { userHandle, cartItems, removeCart, getTotalCartAmount } =
   // useContext(ShopContext);
-
+const navigate = useNavigate()
   const [getCart, setGetCart] = useState([]);
   const [total, setTotal] = useState([]);
 
@@ -104,7 +105,7 @@ const CartItem = () => {
                 <h4 className="bold-18">${total}</h4>
               </div>
             </div>
-            <button className="btn-dark w-44 rounded-xl">Checkout</button>
+            <button onClick={() => navigate("/checkout")} className="btn-dark w-44 rounded-xl">Checkout</button>
           </div>
           <div className="flex flex-col gap-10">
             <h4 className="bold-20 capitalize">Your coupon code enter here:</h4>
