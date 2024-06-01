@@ -9,19 +9,19 @@ const UserAPI = {
 		const url = '/signup';
 		return axiosClient.post(url, {...params});
 	},
-	changePassword: (id) => {
+	changePassword: (id, params) => {
 		const url = `/change-password/${id}`;
-		return axiosClient.put(url);
+		return axiosClient.put(url, {...params});
 	},
 	
-	resetPassword: () => {
+	resetPassword: (email) => {
 		const url = `/reset`;
-		return axiosClient.post(url);
+		return axiosClient.post(url, {email: email});
 	},
 
 	vertifyCodePassword: (token) => {
-		const url = `/resetpass/${token}`;
-		return axiosClient.get(url);
+		const url = `/reset-pass`;
+		return axiosClient.post(url, {token: token});
 	},
 
 	logout: () => {

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import UserAPI from "../apis/user";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [state, setState] = useState("Sign Up");
   const [input, setInput] = useState({
     username: "",
@@ -10,17 +12,14 @@ const Login = () => {
     password: "",
   });
 
-  const navigate = useNavigate();
-  const delay = new Promise((resolve, reject) => {setTimeout(() => {
-    resolve()
-  }, 3000);})
-
   const changeInput = (event) => {
     setInput(() => {
       return {
         ...input,
         username:
-          event.target?.name === "username" ? event.target?.value : input.username,
+          event.target?.name === "username"
+            ? event.target?.value
+            : input.username,
         email:
           event.target?.name === "email" ? event.target?.value : input.email,
         password:
@@ -36,7 +35,7 @@ const Login = () => {
       if (state === "Login") {
         const response = await UserAPI.login(input);
         if (!response?.statusCode) {
-          throw new Error(response.message);
+          throw new Error(response);
         }
         // dispatch({ type: "LOGIN_SUCCESS", payload: response.data });
         localStorage.setItem("id_user", response.meta[0].id);
@@ -48,14 +47,17 @@ const Login = () => {
       } else {
         const response = await UserAPI.register(input);
         if (!response?.statusCode) {
-          throw new Error(response.message);
+          throw new Error(response || "");
         }
         alert(response.message);
         navigate("/login");
         window.location.reload();
       }
     } catch (error) {
-      alert(error || "Đăng nhập thất bại");
+      toast.error(error?.message || (state === "Sign Up" ? "Signup failed" : "Login failed"), {
+        pauseOnFocusLoss: false,
+        pauseOnHover: false,
+      });
     }
   };
 
@@ -64,31 +66,54 @@ const Login = () => {
       <div className="w-full max-2-[666px] h-[600px] bg-primary m-auto px-14 py-10 rounded-md">
         <h3 className="h3">{state}</h3>
         <div className="flex flex-col gap-4 mt-7">
-          {state === "Sign Up" ? (
+          <div className="flex flex-col gap-4">
             <input
               onChange={(e) => changeInput(e)}
-              name="username"
-              type="text"
-              placeholder="Your Name"
+              onBlur={(e) => {
+                e.target.value.trim() === "" &&
+                  toast.error("email cannot be empty", {
+                    pauseOnFocusLoss: false,
+                    pauseOnHover: false,
+                  });
+              }}
+              name="email"
+              type={"email"}
+              placeholder="Your Email"
               className="h-8 w-full pl-5 bg-white outline-none rounded-xl text-sm"
             />
+          </div>
+          {state === "Sign Up" ? (
+            <>
+              <input
+                onChange={(e) => changeInput(e)}
+                onBlur={(e) => {
+                  e.target.value.trim() === "" &&
+                    toast.error("username cannot be empty");
+                }}
+                name="username"
+                type="text"
+                placeholder="Your Name"
+                className="h-8 w-full pl-5 bg-white outline-none rounded-xl text-sm"
+              />
+            </>
           ) : (
-            ""
+            <div className="flex flex-col gap-4">
+              <input
+                onChange={(e) => changeInput(e)}
+                onBlur={(e) => {
+                  e.target.value.trim() === "" &&
+                    toast.error("password cannot be empty", {
+                      pauseOnFocusLoss: false,
+                      pauseOnHover: false,
+                    });
+                }}
+                name="password"
+                type={"password"}
+                placeholder="Your Pass"
+                className="h-8 w-full pl-5 bg-white outline-none rounded-xl text-sm"
+              />
+            </div>
           )}
-          <input
-            onChange={(e) => changeInput(e)}
-            name="email"
-            type={"email"}
-            placeholder="Your Email"
-            className="h-8 w-full pl-5 bg-white outline-none rounded-xl text-sm"
-          />
-          <input
-            onChange={(e) => changeInput(e)}
-            name="password"
-            type={"password"}
-            placeholder="Your Pass"
-            className="h-8 w-full pl-5 bg-white outline-none rounded-xl text-sm"
-          />
         </div>
         <button
           onClick={handleSubmit}
@@ -119,24 +144,28 @@ const Login = () => {
               </span>
             </p>
             {/* <div className="py-4"> */}
-              <p className="text-black pb-2 font-bold">
-                Forgot Password{" "}
-                <span
-                  onClick={() => navigate("/change-password", { state: { id: 7, flag: 'forgot password' } })}
-                  className="text-secondary underline cursor-pointer"
-                >
-                  Click Here!
-                </span>
-              </p>
-              <p className="text-black font-bold">
-                Change new password{" "}
-                <span
-                  onClick={() => navigate("/change-password")}
-                  className="text-secondary underline cursor-pointer"
-                >
-                  Click Here!
-                </span>
-              </p>
+            <p className="text-black pb-2 font-bold">
+              Forgot Password{" "}
+              <span
+                onClick={() =>
+                  navigate("/change-password", {
+                    state: { id: 7, flag: "Forgot password" },
+                  })
+                }
+                className="text-secondary underline cursor-pointer"
+              >
+                Click Here!
+              </span>
+            </p>
+            <p className="text-black font-bold">
+              Change new password{" "}
+              <span
+                onClick={() => navigate("/change-password")}
+                className="text-secondary underline cursor-pointer"
+              >
+                Click Here!
+              </span>
+            </p>
             {/* </div> */}
           </>
         )}

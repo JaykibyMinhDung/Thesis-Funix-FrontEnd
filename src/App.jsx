@@ -15,6 +15,7 @@ import Checkout from "./page/Checkout";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import ChangePassword from "./components/ChangePassword";
+import ForgotPassword from "./components/ForgotPassword";
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -48,6 +49,7 @@ function App() {
           <Route path="/cart-page" element={<Cart />} />
           <Route path="/login" element={<Login />} />
           <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
         <Footer />
       </BrowserRouter>

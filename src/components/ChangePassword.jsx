@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import UserAPI from "../apis/user";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
@@ -35,11 +36,18 @@ const ChangePassword = () => {
   const handleSubmit = async () => {
     try {
       if (statePassWord === "Change New Password") {
-        UserAPI.login();
+        const { meta } = await UserAPI.login()[0]
+        const result = await UserAPI.changePassword(meta.id, input);
+        return toast.success(result.message, {pauseOnFocusLoss: false, pauseOnHover: false})
+      }
+      if (statePassWord === "Forgot password") {
+        const result = await UserAPI.resetPassword(input.email);
+        toast.success(result.message, {pauseOnFocusLoss: false, pauseOnHover: false})
+        return navigate("/forgot-password")
       }
       // window.location.replace("http://localhost:3001/");
     } catch (error) {
-      alert(error || "Đăng nhập thất bại");
+      alert(error.message || "Đăng nhập thất bại");
     }
   };
   return (

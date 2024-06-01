@@ -3,9 +3,10 @@ import { FaHeart, FaStar, FaRegStar } from "react-icons/fa";
 import { ShopContext } from "../context/ShopContext";
 import ProductAPI from "../apis/product";
 import { toast } from "react-toastify";
+import { delay } from "../util/async";
+
 
 const ProductDisplay = ({ product }) => {
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   // const { userHandle } = useContext(ShopContext);
   // console.log(localStorage.getItem("id_user"))
   // console.log(JSON.parse(localStorage.getItem("id_user")))
