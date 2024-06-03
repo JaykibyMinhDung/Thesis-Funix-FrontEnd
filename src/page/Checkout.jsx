@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { TbArrowRight } from "react-icons/tb";
+import ProductAPI from "../apis/product";
+import { generateAccessToken } from "../util/async";
+import axios from "axios";
 
 const Checkout = () => {
   const [carts, setCarts] = useState([]);
 
   const [total, setTotal] = useState(0);
+  console.log(import.meta.env.VITE_CLIENT_ID);
 
-  const [fullname, setFullname] = useState("");
-  const [fullnameError, setFullnameError] = useState(false);
+  const [shipping, setShipping] = useState("");
+  const [shippingError, setShippingError] = useState(false);
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
@@ -20,9 +24,56 @@ const Checkout = () => {
   const [address, setAddress] = useState("");
   const [addressError, setAddressError] = useState(false);
 
+  const [message, setmessage] = useState("");
+
+  const [methodPay, setMethodPay] = useState("");
+  const [methodPayError, setMethodPayError] = useState(false);
+
   const [success, setSuccess] = useState(false);
 
   const [load, setLoad] = useState(false);
+
+  const createOrder = async (item, total) => {
+    const accessToken = await generateAccessToken();
+
+    const response = await axios({
+      url: "https://api-m.sandbox.paypal.com/v2/checkout/orders",
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + accessToken,
+      },
+      data: JSON.stringify({
+        intent: "CAPTURE",
+        purchase_units: [
+          {
+            items: item,
+
+            amount: {
+              currency_code: "USD",
+              value: total,
+              breakdown: {
+                item_total: {
+                  currency_code: "USD",
+                  value: total,
+                },
+              },
+            },
+          },
+        ],
+        application_context: {
+          return_url: import.meta.env.VITE_URL_BASE + "/complete-order",
+          cancel_url: import.meta.env.VITE_URL_BASE + "/cancel-order",
+          shipping_preference: "NO_SHIPPING",
+          user_action: "PAY_NOW",
+          brand_name: "manfra.io",
+        },
+      }),
+    });
+
+    console.log(response.data);
+    return response.data.links.find((link) => link.rel === "approve").href;
+  };
 
   //Hàm này dùng để gọi API và render số sản phẩm
   useEffect(() => {
@@ -35,14 +86,15 @@ const Checkout = () => {
         const query = "?";
         // + queryString.stringify(params);
 
-        const response = "";
-        // await CartAPI.getCarts(query);
+        const response = await ProductAPI.getCart(params.idUser);
 
-        // console.log(response);
+        console.log(response);
 
-        setCarts(response.data.cart);
+        setCarts(response.cart.cartData);
 
-        getTotal(response.data.cart);
+        // getTotal(response.total);
+        setTotal(response.total);
+        setFullname(response.cart.name);
 
         if (response.length === 0) {
           window.location.replace("/cart");
@@ -56,65 +108,80 @@ const Checkout = () => {
   }, []);
 
   //Hàm này dùng để tính tổng tiền carts
-  function getTotal(carts) {
-    let sub_total = 0;
-    // const sum_total =
-    carts.map((value) => {
-      return (sub_total +=
-        parseInt(value.priceProduct) * parseInt(value.count));
-    });
+  // function getTotal(carts) {
+  //   let sub_total = 0;
+  //   // const sum_total =
+  //   carts.map((value) => {
+  //     return (sub_total +=
+  //       parseInt(value.priceProduct) * parseInt(value.count));
+  //   });
 
-    setTotal(sub_total);
-  }
+  //   setTotal(sub_total);
+  // }
 
   //Check Validation
   const handlerSubmit = () => {
-    if (!fullname) {
-      setFullnameError(true);
+    if (!shipping) {
+      setShippingError(true);
       setEmailError(false);
       setPhoneError(false);
       setAddressError(false);
+      setMethodPayError(false);
       return;
     } else {
       if (!email) {
-        setFullnameError(false);
+        setShippingError(false);
         setEmailError(true);
         setPhoneError(false);
         setAddressError(false);
+        setMethodPayError(false);
         return;
       } else {
         setPhoneError(false);
         setAddressError(false);
-        setFullnameError(false);
+        setMethodPayError(false);
+        setShippingError(false);
 
         if (!validateEmail(email)) {
           setEmailRegex(true);
-          setFullnameError(false);
+          setShippingError(false);
           setEmailError(false);
           setPhoneError(false);
           setAddressError(false);
+          setMethodPayError(false);
           return;
         } else {
           setEmailRegex(false);
 
           if (!phone) {
-            setFullnameError(false);
+            setShippingError(false);
             setEmailError(false);
             setPhoneError(true);
             setAddressError(false);
+            setMethodPayError(false);
             return;
           } else {
-            setFullnameError(false);
+            setShippingError(false);
             setEmailError(false);
             setPhoneError(false);
             setAddressError(false);
+            setMethodPayError(false);
 
             if (!address) {
-              setFullnameError(false);
+              setShippingError(false);
               setEmailError(false);
               setPhoneError(false);
               setAddressError(true);
+              setMethodPayError(false);
             } else {
+              if (!methodPay) {
+                setShippingError(false);
+                setEmailError(false);
+                setPhoneError(false);
+                setAddressError(true);
+                setMethodPayError(true);
+            } else {
+              createOrder(carts, total);
               console.log("Thanh Cong");
 
               setLoad(!load);
@@ -124,6 +191,7 @@ const Checkout = () => {
       }
     }
   };
+}
 
   //Hàm này bắt đầu gửi Email xác nhận đơn hàng
   useEffect(() => {
@@ -149,6 +217,8 @@ const Checkout = () => {
       sendMail();
 
       const data = localStorage.getItem("id_user");
+      console.log(localStorage.getItem("user")?.email);
+      setEmail(data);
 
       // Gửi socket lên server
       // socket.emit('send_order', data);
@@ -162,8 +232,8 @@ const Checkout = () => {
     }
   }, [load]);
 
-  const onChangeName = (e) => {
-    setFullname(e.target.value);
+  const onChangeMessage = (e) => {
+    setmessage(e.target.value);
   };
 
   const onChangeEmail = (e) => {
@@ -176,6 +246,14 @@ const Checkout = () => {
 
   const onChangeAddress = (e) => {
     setAddress(e.target.value);
+  };
+
+  const onChangemethodPayment = (e) => {
+    setMethodPay(e.target.value);
+  };
+
+  const onChangeshipping = (e) => {
+    setShipping(e.target.value);
   };
 
   function validateEmail(email) {
@@ -233,7 +311,7 @@ const Checkout = () => {
               <div className="w-[80%] mx-4">
                 <form>
                   <div className="flex flex-col gap-4">
-                    <div className="col-lg-12 form-group">
+                    {/* <div className="col-lg-12 form-group">
                       <label
                         className="text-small text-uppercase"
                         htmlFor="Fullname"
@@ -252,7 +330,7 @@ const Checkout = () => {
                           * Please Check Your Full Name!
                         </span>
                       )}
-                    </div>
+                    </div> */}
                     <div className="col-lg-12 form-group">
                       <label
                         className="text-small text-uppercase"
@@ -262,21 +340,21 @@ const Checkout = () => {
                       </label>
                       <input
                         className="bg-transparent border-none outline-none form-control form-control-lg"
-                        value={email}
-                        onChange={onChangeEmail}
+                        value={message}
+                        onChange={onChangeMessage}
                         type="text"
                         placeholder="Enter Your Email Here!"
                       />
-                      {emailError && (
+                      {/* {emailError && (
                         <span className="text-danger">
                           * Please Check Your Email!
                         </span>
-                      )}
-                      {emailRegex && (
+                      )} */}
+                      {/* {emailRegex && (
                         <span className="text-danger">
                           * Incorrect Email Format
                         </span>
-                      )}
+                      )} */}
                     </div>
                     <div className="col-lg-12 form-group">
                       <label
@@ -328,12 +406,12 @@ const Checkout = () => {
                       </label>
                       <input
                         className="bg-transparent border-none outline-none form-control form-control-lg"
-                        // value={shipping}
-                        // onChange={onChangeshipping}
+                        value={shipping}
+                        onChange={onChangeshipping}
                         type="text"
                         placeholder="Enter Your shipping Here!"
                       />
-                      {addressError && (
+                      {shippingError && (
                         <span className="text-danger">
                           * Please Check Your Method Ship!
                         </span>
@@ -346,18 +424,21 @@ const Checkout = () => {
                       >
                         MethodPay:{" "}
                       </label>
-                      <input
-                        className="bg-transparent border-none outline-none form-control form-control-lg"
-                        // value={methodPay}
-                        // onChange={onChangemethodPay}
-                        type="text"
-                        placeholder="Enter Your methodPay Here!"
-                      />
-                      {/* {methodPayError && (
+                      <select
+                        value={methodPay}
+                        onChange={onChangemethodPayment}
+                        name="paymentMethod"
+                        id=""
+                      >
+                        <option value="">Please choose method</option>
+                        <option value="cash">cash</option>
+                        <option value="cart">cart</option>
+                      </select>
+                      {methodPayError && (
                         <span className="text-danger">
                           * Please Check Your methodPay!
                         </span>
-                      )} */}
+                      )}
                     </div>
                     <div className="col-lg-12 form-group">
                       <button
@@ -375,7 +456,7 @@ const Checkout = () => {
               <div className="w-[70%] col-lg-4 flexCenterTop">
                 <div className="card border-0 rounded-0 p-lg-4 bg-light">
                   <div className="card-body">
-                    <h2 className="h3 text-uppercase mb-4">{"<nameCustomer>"} order</h2>
+                    <h2 className="h3 text-uppercase mb-4">Order{"'s "}</h2>
                     <ul className="list-unstyled mb-0">
                       {carts &&
                         carts.map((value) => (
@@ -389,19 +470,19 @@ const Checkout = () => {
                                 {/* {convertMoney(
 																	value.priceProduct
 																)}{' '} */}
-                                5000000 VND x {value.count}
+                                <b>{value.name}</b>: ${value.new_price} x{" "}
+                                {value.quantity}
                               </span>
                             </li>
                             <li className="border-bottom my-2"></li>
                           </div>
                         ))}
-                      <li className="d-flex align-items-center justify-content-between">
+                      <li className="d-flex align-items-center justify-content-between pt-5">
                         <strong className="text-uppercase text-2xl font-weight-bold">
-                          Total: {" "}
+                          Total:{" "}
                         </strong>
                         <span>
-                          {/* {convertMoney(total)} VND */}
-                          500000
+                          {/* {convertMoney(total)} VND */}$ {total}
                         </span>
                       </li>
                     </ul>
