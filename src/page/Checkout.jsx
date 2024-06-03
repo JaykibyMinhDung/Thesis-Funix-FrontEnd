@@ -3,12 +3,13 @@ import { TbArrowRight } from "react-icons/tb";
 import ProductAPI from "../apis/product";
 import { generateAccessToken } from "../util/async";
 import axios from "axios";
+import OrderAPI from "../apis/order";
 
 const Checkout = () => {
   const [carts, setCarts] = useState([]);
 
   const [total, setTotal] = useState(0);
-  console.log(import.meta.env.VITE_CLIENT_ID);
+  // console.log(import.meta.env.VITE_CLIENT_ID);
 
   const [shipping, setShipping] = useState("");
   const [shippingError, setShippingError] = useState(false);
@@ -16,7 +17,8 @@ const Checkout = () => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
 
-  const [emailRegex, setEmailRegex] = useState(false);
+  // const [emailRegex, setEmailRegex] = useState(false);
+  const [idUser, setIdUser] = useState("");
 
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState(false);
@@ -33,47 +35,47 @@ const Checkout = () => {
 
   const [load, setLoad] = useState(false);
 
-  const createOrder = async (item, total) => {
-    const accessToken = await generateAccessToken();
+  // const createOrder = async (item, total) => {
+  //   const accessToken = await generateAccessToken();
 
-    const response = await axios({
-      url: "https://api-m.sandbox.paypal.com/v2/checkout/orders",
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + accessToken,
-      },
-      data: JSON.stringify({
-        intent: "CAPTURE",
-        purchase_units: [
-          {
-            items: item,
+  //   const response = await axios({
+  //     url: "https://api-m.sandbox.paypal.com/v2/checkout/orders",
+  //     method: "post",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: "Bearer " + accessToken,
+  //     },
+  //     data: JSON.stringify({
+  //       intent: "CAPTURE",
+  //       purchase_units: [
+  //         {
+  //           items: item,
 
-            amount: {
-              currency_code: "USD",
-              value: total,
-              breakdown: {
-                item_total: {
-                  currency_code: "USD",
-                  value: total,
-                },
-              },
-            },
-          },
-        ],
-        application_context: {
-          return_url: import.meta.env.VITE_URL_BASE + "/complete-order",
-          cancel_url: import.meta.env.VITE_URL_BASE + "/cancel-order",
-          shipping_preference: "NO_SHIPPING",
-          user_action: "PAY_NOW",
-          brand_name: "manfra.io",
-        },
-      }),
-    });
+  //           amount: {
+  //             currency_code: "USD",
+  //             value: total,
+  //             breakdown: {
+  //               item_total: {
+  //                 currency_code: "USD",
+  //                 value: total,
+  //               },
+  //             },
+  //           },
+  //         },
+  //       ],
+  //       application_context: {
+  //         return_url: import.meta.env.VITE_URL_BASE + "/complete-order",
+  //         cancel_url: import.meta.env.VITE_URL_BASE + "/cancel-order",
+  //         shipping_preference: "NO_SHIPPING",
+  //         user_action: "PAY_NOW",
+  //         brand_name: "manfra.io",
+  //       },
+  //     }),
+  //   });
 
-    console.log(response.data);
-    return response.data.links.find((link) => link.rel === "approve").href;
-  };
+  //   console.log(response.data);
+  //   return response.data.links.find((link) => link.rel === "approve").href;
+  // };
 
   //Hàm này dùng để gọi API và render số sản phẩm
   useEffect(() => {
@@ -87,14 +89,14 @@ const Checkout = () => {
         // + queryString.stringify(params);
 
         const response = await ProductAPI.getCart(params.idUser);
-
-        console.log(response);
+        setIdUser(params.idUser)
+        // console.log(response);
 
         setCarts(response.cart.cartData);
 
         // getTotal(response.total);
         setTotal(response.total);
-        setFullname(response.cart.name);
+        // setFullname(response.cart.name);
 
         if (response.length === 0) {
           window.location.replace("/cart");
@@ -120,7 +122,7 @@ const Checkout = () => {
   // }
 
   //Check Validation
-  const handlerSubmit = () => {
+  const handlerSubmit = async () => {
     if (!shipping) {
       setShippingError(true);
       setEmailError(false);
@@ -129,29 +131,30 @@ const Checkout = () => {
       setMethodPayError(false);
       return;
     } else {
-      if (!email) {
-        setShippingError(false);
-        setEmailError(true);
-        setPhoneError(false);
-        setAddressError(false);
-        setMethodPayError(false);
-        return;
-      } else {
-        setPhoneError(false);
-        setAddressError(false);
-        setMethodPayError(false);
-        setShippingError(false);
-
-        if (!validateEmail(email)) {
-          setEmailRegex(true);
-          setShippingError(false);
-          setEmailError(false);
-          setPhoneError(false);
-          setAddressError(false);
-          setMethodPayError(false);
-          return;
-        } else {
-          setEmailRegex(false);
+      // if (!email) {
+      //   setShippingError(false);
+      //   setEmailError(true);
+      //   setPhoneError(false);
+      //   setAddressError(false);
+      //   setMethodPayError(false);
+      //   return;
+      // }
+      //  else {
+        // setPhoneError(false);
+        // setAddressError(false);
+        // setMethodPayError(false);
+        // setShippingError(false);
+        // if (!validateEmail(email)) {
+        //   setEmailRegex(true);
+        //   setShippingError(false);
+        //   setEmailError(false);
+        //   setPhoneError(false);
+        //   setAddressError(false);
+        //   setMethodPayError(false);
+        //   return;
+        // } 
+        // else {
+        //   setEmailRegex(false);
 
           if (!phone) {
             setShippingError(false);
@@ -181,17 +184,37 @@ const Checkout = () => {
                 setAddressError(true);
                 setMethodPayError(true);
             } else {
-              createOrder(carts, total);
-              console.log("Thanh Cong");
+              const saveOrder = await OrderAPI.newOrder({
+                user: idUser,
+                phoneNumber: phone,
+                message: message,
+                address: address,
+                shipping: shipping,
+                cart: carts,
+                methodPay: methodPay,
+                progressingDelivery: "pendding"
+              });
+              const submitData = await OrderAPI.paymentOrder();
+              await window.location.replace(submitData.link)
+              console.log("link", submitData)
+              console.log("result", saveOrder)
+              // console.log("data", {
+              //   phoneNumber: phone,
+              //   message: message,
+              //   address: address,
+              //   shipping: shipping,
+              //   methodPay: methodPay
+              // })
+              // return console.log(link);
 
-              setLoad(!load);
+              // setLoad(!load);
             }
           }
         }
       }
     }
-  };
-}
+  // };
+// }
 
   //Hàm này bắt đầu gửi Email xác nhận đơn hàng
   useEffect(() => {
@@ -444,7 +467,8 @@ const Checkout = () => {
                       <button
                         className=" w-[50%] rounded-xl btn-dark"
                         style={{ color: "white" }}
-                        type="submit"
+                        // type="submit"
+                        type="button"
                         onClick={handlerSubmit}
                       >
                         Complete order

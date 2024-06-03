@@ -1,13 +1,13 @@
 import axiosClient from './axiosClient';
 
 const OrderAPI = {
-	login: (params) => {
-		const url = '/login';
+	newOrder: (params) => {
+		const url = '/api/order';
 		return axiosClient.post(url, {...params});
 	},
-	register: (params) => {
-		const url = '/signup';
-		return axiosClient.post(url, {...params});
+	paymentOrder: () => {
+		const url = '/api/test';
+		return axiosClient.get(url);
 	},
 };
 
