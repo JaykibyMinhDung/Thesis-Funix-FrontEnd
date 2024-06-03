@@ -14,6 +14,8 @@ const navigate = useNavigate()
 
   const removeCart = async (id) => {
     try {
+      const isRemoveCart = confirm("Do you want remove product?")
+      if (!isRemoveCart) return  
       const resul = await ProductAPI.deletedCart({
         count: 1,
         idProduct: id,
@@ -25,6 +27,10 @@ const navigate = useNavigate()
       toast.error(error.message);
     }
   };
+
+  const submitCoupon = () => {
+    return toast.info("The code is not active, please wait the next time")
+  }
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -47,6 +53,8 @@ const navigate = useNavigate()
               <th className="p-1 py-2">Products</th>
               <th className="p-1 py-2">Title</th>
               <th className="p-1 py-2">Price</th>
+              <th className="p-1 py-2">Size</th>
+              <th className="p-1 py-2">Color</th>
               <th className="p-1 py-2">Quantity</th>
               <th className="p-1 py-2">Total</th>
               <th className="p-1 py-2">Remove</th>
@@ -73,6 +81,8 @@ const navigate = useNavigate()
                       <div className="line-clamp-3">{product.name}</div>
                     </td>
                     <td>${product.new_price}</td>
+                    <td>{product?.size || "S"}</td>
+                    <td>{product?.color || "default"}</td>
                     <td className="w-16 h-16 bg-white">{product.quantity}</td>
                     <td>${product.new_price * product.quantity}</td>
                     <td>
@@ -115,7 +125,7 @@ const navigate = useNavigate()
                 placeholder="coupon code"
                 className="bg-transparent border-none outline-none"
               />
-              <button className="btn-dark rounded-lg relative right-[0.33rem]">
+              <button onClick={submitCoupon} className="btn-dark rounded-lg relative right-[0.33rem]">
                 Submit
               </button>
             </div>

@@ -3,6 +3,7 @@ import UserAPI from "../apis/user";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+
 const Login = () => {
   const navigate = useNavigate();
   const [state, setState] = useState("Sign Up");
@@ -11,7 +12,26 @@ const Login = () => {
     email: "",
     password: "",
   });
-
+  const validateEmail = (e) => {
+    const isEmail = String(e.target.value)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+    if (e.target.value.trim() === "") {
+      toast.error("email cannot be empty", {
+        pauseOnFocusLoss: false,
+        pauseOnHover: false,
+      });
+    }
+    if (!isEmail) {
+      toast.error("Not type email, please try again", {
+        pauseOnFocusLoss: false,
+        pauseOnHover: false,
+      });
+    }
+  };
+  
   const changeInput = (event) => {
     setInput(() => {
       return {
@@ -35,7 +55,7 @@ const Login = () => {
       if (state === "Login") {
         const response = await UserAPI.login(input);
         if (!response?.statusCode) {
-          throw new Error(response);
+          throw new Error(response?.message);
         }
         // dispatch({ type: "LOGIN_SUCCESS", payload: response.data });
         localStorage.setItem("id_user", response.meta[0].id);
@@ -47,17 +67,22 @@ const Login = () => {
       } else {
         const response = await UserAPI.register(input);
         if (!response?.statusCode) {
-          throw new Error(response || "");
+          throw new Error(response?.message || "");
         }
         alert(response.message);
-        navigate("/login");
-        window.location.reload();
+        setState("Login");
+        // window.location.reload();
       }
     } catch (error) {
-      toast.error(error?.message || (state === "Sign Up" ? "Signup failed" : "Login failed"), {
-        pauseOnFocusLoss: false,
-        pauseOnHover: false,
-      });
+      // console.log(error)
+      toast.error(
+        error?.message ||
+          (state === "Sign Up" ? "Signup failed" : "Email or password incorrect"),
+        {
+          pauseOnFocusLoss: false,
+          pauseOnHover: false,
+        }
+      );
     }
   };
 
@@ -69,13 +94,7 @@ const Login = () => {
           <div className="flex flex-col gap-4">
             <input
               onChange={(e) => changeInput(e)}
-              onBlur={(e) => {
-                e.target.value.trim() === "" &&
-                  toast.error("email cannot be empty", {
-                    pauseOnFocusLoss: false,
-                    pauseOnHover: false,
-                  });
-              }}
+              onBlur={(e) => validateEmail(e)}
               name="email"
               type={"email"}
               placeholder="Your Email"

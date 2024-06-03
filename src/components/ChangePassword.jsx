@@ -42,6 +42,10 @@ const ChangePassword = () => {
       }
       if (statePassWord === "Forgot password") {
         const result = await UserAPI.resetPassword(input.email);
+        if (result?.error) {
+          toast.error(result.error)
+          return 
+        }
         toast.success(result.message, {pauseOnFocusLoss: false, pauseOnHover: false})
         return navigate("/forgot-password")
       }
